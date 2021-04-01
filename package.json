@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Learn Mocha",
   "main": "index.js",
+  "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -16,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/outsideris/learn-mocha/issues"
   },
-  "homepage": "https://github.com/outsideris/learn-mocha#readme"
+  "homepage": "https://github.com/outsideris/learn-mocha#readme",
+  "devDependencies": {
+    "mocha": "^8.3.2"
+  }
 }

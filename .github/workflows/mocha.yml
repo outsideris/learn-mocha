@@ -1,0 +1,71 @@
+name: Tests
+'on':
+  push:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  prevent-run-twice:
+    name: Prevent to run twice
+    runs-on: ubuntu-latest
+    # Run 'pull-request' event only on external PRs from forked repos.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    steps:
+      - run: 'echo run Tests'
+  lint:
+    name: Linting code and markdown
+    runs-on: ubuntu-latest
+    needs: prevent-run-twice
+    steps:
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - uses: actions/checkout@v2
+      - name: 'Cache node_modules'
+        uses: actions/cache@v2
+        with:
+          path: '~/.npm'
+          key: "ubuntu-latest-node-v14-${{ hashFiles('**/package-lock.json') }}"
+          restore-keys: |
+            ubuntu-latest-node-v14-
+      - name: Install Dependencies
+        run: npm ci --ignore-scripts
+      - name: 'Check lint'
+        run: npm start lint
+
+  test-node:
+    name: 'Node.js [v${{ matrix.node }} / ${{ matrix.os }}]'
+    needs: lint
+    runs-on: '${{ matrix.os }}'
+    env:
+      NODE_OPTIONS: '--trace-warnings'
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-2019
+        node:
+          - 10
+          - 12
+          - 14
+          - 15
+    steps:
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '${{ matrix.node }}'
+      - uses: actions/checkout@v2
+      - name: 'Cache node_modules (Linux)'
+        if: "${{ matrix.os != 'windows-2019' }}"
+        uses: actions/cache@v2
+        with:
+          path: '~/.npm'
+          key: "${{ matrix.os }}-node-v${{ matrix.node }}-${{ hashFiles('**/package-lock.json') }}"
+          restore-keys: |
+            ${{ matrix.os }}-node-v${{ matrix.node }}-
+      - name: Install Dependencies
+        run: npm ci --ignore-scripts
+      - name: Run All Node.js Tests
+        run: npm test

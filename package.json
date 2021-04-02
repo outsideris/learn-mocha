@@ -20,7 +20,17 @@
   },
   "homepage": "https://github.com/outsideris/learn-mocha#readme",
   "devDependencies": {
+    "eslint": "^7.23.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-config-semistandard": "^15.0.1",
+    "eslint-plugin-prettier": "^3.3.1",
     "mocha": "^8.3.2",
-    "nps": "^5.10.0"
+    "nps": "^5.10.0",
+    "prettier": "^2.2.1"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "bracketSpacing": false,
+    "endOfLine": "auto"
   }
 }

@@ -1,3 +1,47 @@
 #!/usr/bin/env node
 
 'use strict';
+
+const unparse = require('yargs-unparser');
+const debug= require('debug')('mocha:cli:mocha');
+
+const mochaArgs = {};
+
+const {spawn} = require('child_process');
+// TODO(outsider): why not use require('path').resolve
+const mochaPath = require.resolve('../lib/cli/cli.js');
+
+const args = [].concat(
+  mochaPath,
+  unparse(mochaArgs)
+);
+
+debug(
+  'forking child process via command: %s %s',
+  process.execPath,
+  args.join(' ')
+);
+
+const proc = spawn(process.execPath, args, {
+  stdio: 'inherit'
+});
+
+proc.on('exit', (code, signal) => {
+  debug('proc.on(exit) %s %s', code, signal);
+  process.on('exit', () => {
+    debug('process.on(exit) %s %s', code, signal);
+    if (signal) {
+      process.kill(process.pid, signal);
+    } else {
+      process.exit(code);
+    }
+  });
+});
+
+process.on('SIGINT', () => {
+  debug('main process caught SIGINT');
+  proc.kill('SIGINT');
+
+  debug('sending SIGTERM to child process');
+  proc.kill('SIGTERM');
+});

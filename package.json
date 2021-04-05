@@ -19,6 +19,10 @@
     "url": "https://github.com/outsideris/learn-mocha/issues"
   },
   "homepage": "https://github.com/outsideris/learn-mocha#readme",
+  "dependencies": {
+    "debug": "^4.3.1",
+    "yargs-unparser": "^2.0.0"
+  },
   "devDependencies": {
     "eslint": "^7.23.0",
     "eslint-config-prettier": "^8.1.0",
